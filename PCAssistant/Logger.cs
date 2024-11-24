@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Text.RegularExpressions;
 
 namespace PCAssistant
 {
@@ -101,8 +102,9 @@ namespace PCAssistant
             {
                 while (_messageQueue.TryDequeue(out LogMessage? message))
                 {
-                    string logText = message.ToString();
-
+                    // 清理日志文本，移除多余的空行
+                    string logText = message.ToString().Trim();
+                    
                     // 写入文件
                     try
                     {
@@ -148,7 +150,10 @@ namespace PCAssistant
                 _logTextBox.Clear();
             }
 
-            _logTextBox.AppendText(logText + Environment.NewLine);
+            // 过滤多余的换行符，将连续的换行符替换为单个换行符
+            string cleanedText = Regex.Replace(logText.Trim(), @"[\r\n]+", Environment.NewLine);
+            
+            _logTextBox.AppendText(cleanedText + Environment.NewLine);
             _logTextBox.SelectionStart = _logTextBox.TextLength;
             _logTextBox.ScrollToCaret();
         }

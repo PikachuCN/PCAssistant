@@ -130,7 +130,7 @@
             tabPage3.Location = new Point(4, 26);
             tabPage3.Name = "tabPage3";
             tabPage3.Padding = new Padding(3);
-            tabPage3.Size = new Size(528, 168);
+            tabPage3.Size = new Size(808, 168);
             tabPage3.TabIndex = 2;
             tabPage3.Text = "系统备份";
             tabPage3.UseVisualStyleBackColor = true;
@@ -152,6 +152,7 @@
             LogTxtbox.Location = new Point(3, 19);
             LogTxtbox.Multiline = true;
             LogTxtbox.Name = "LogTxtbox";
+            LogTxtbox.ScrollBars = ScrollBars.Vertical;
             LogTxtbox.Size = new Size(810, 239);
             LogTxtbox.TabIndex = 0;
             // 
