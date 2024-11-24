@@ -11,6 +11,14 @@ namespace PCAssistant
         {
             InitializeComponent();
             Logger.Initialize(LogTxtbox); // 初始化日志系统
+            
+            // 添加定时器更新状态栏时间
+            System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
+            timer.Interval = 1000; // 每秒更新一次
+            timer.Tick += (s, e) => {
+                toolStripStatusLabel1.Text = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            };
+            timer.Start();
         }
 
         private void Main_Load(object sender, EventArgs e)
@@ -22,11 +30,29 @@ namespace PCAssistant
 
             Logger.Instance.Info("应用程序启动");
 
-            ComputerInfo ci = new ComputerInfo();
-            string info = ci.GetInfoString();
-            txtComputerInfo.Text = info;
-
-            Logger.Instance.Info("已加载系统信息");
+            try
+            {
+                ComputerInfo ci = new  ComputerInfo();
+                
+                // 显示信息到界面
+                txtComputerInfo.Text = ci.GetInfoString();
+                
+                // 保存到JSON文件
+                string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+                string jsonPath = Path.Combine(baseDir, "ComputerInfo");
+                Directory.CreateDirectory(jsonPath);
+                
+                string fileName = $"ComputerInfo_{DateTime.Now:yyyyMMdd_HHmmss}.json";
+                string fullPath = Path.Combine(jsonPath, fileName);
+                
+          
+                
+                Logger.Instance.Info("已加载并保存系统信息");
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.Error($"处理系统信息时发生错误: {ex.Message}");
+            }
         }
 
         private async void 服务器设置ToolStripMenuItem_Click(object sender, EventArgs e)
@@ -152,7 +178,7 @@ namespace PCAssistant
 
 
 
-        private async void button3_Click(object sender, EventArgs e)
+        private async void DocumentMigrationBtn_Click(object sender, EventArgs e)
         {
             try
             {

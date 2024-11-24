@@ -32,7 +32,7 @@
             tabPage1 = new TabPage();
             txtComputerInfo = new TextBox();
             tabPage2 = new TabPage();
-            button3 = new Button();
+            DocumentMigrationBtn = new Button();
             NetBtn = new Button();
             ActivationSystemBtn = new Button();
             tabPage3 = new TabPage();
@@ -43,11 +43,12 @@
             设置ToolStripMenuItem = new ToolStripMenuItem();
             切换管理权限ToolStripMenuItem = new ToolStripMenuItem();
             服务器设置ToolStripMenuItem = new ToolStripMenuItem();
-            DocumentMigrationBtn = new Button();
+            toolStripStatusLabel1 = new ToolStripStatusLabel();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
             tabPage2.SuspendLayout();
             groupBox1.SuspendLayout();
+            statusStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -87,7 +88,7 @@
             // 
             // tabPage2
             // 
-            tabPage2.Controls.Add(button3);
+            tabPage2.Controls.Add(DocumentMigrationBtn);
             tabPage2.Controls.Add(NetBtn);
             tabPage2.Controls.Add(ActivationSystemBtn);
             tabPage2.Location = new Point(4, 26);
@@ -98,15 +99,15 @@
             tabPage2.Text = "系统维护";
             tabPage2.UseVisualStyleBackColor = true;
             // 
-            // button3
+            // DocumentMigrationBtn
             // 
-            button3.Location = new Point(282, 6);
-            button3.Name = "button3";
-            button3.Size = new Size(132, 55);
-            button3.TabIndex = 2;
-            button3.Text = "文档与桌面迁移";
-            button3.UseVisualStyleBackColor = true;
-            button3.Click += button3_Click;
+            DocumentMigrationBtn.Location = new Point(282, 6);
+            DocumentMigrationBtn.Name = "DocumentMigrationBtn";
+            DocumentMigrationBtn.Size = new Size(132, 55);
+            DocumentMigrationBtn.TabIndex = 2;
+            DocumentMigrationBtn.Text = "文档与桌面迁移";
+            DocumentMigrationBtn.UseVisualStyleBackColor = true;
+            DocumentMigrationBtn.Click += DocumentMigrationBtn_Click;
             // 
             // NetBtn
             // 
@@ -161,6 +162,7 @@
             // 
             // statusStrip1
             // 
+            statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel1 });
             statusStrip1.Location = new Point(5, 489);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Size = new Size(816, 22);
@@ -196,12 +198,11 @@
             服务器设置ToolStripMenuItem.Text = "服务器设置";
             服务器设置ToolStripMenuItem.Click += 服务器设置ToolStripMenuItem_Click;
             // 
-            // DocumentMigrationBtn
+            // toolStripStatusLabel1
             // 
-            DocumentMigrationBtn.Location = new Point(0, 0);
-            DocumentMigrationBtn.Name = "DocumentMigrationBtn";
-            DocumentMigrationBtn.Size = new Size(75, 23);
-            DocumentMigrationBtn.TabIndex = 0;
+            toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            toolStripStatusLabel1.Size = new Size(131, 17);
+            toolStripStatusLabel1.Text = "toolStripStatusLabel1";
             // 
             // Main
             // 
@@ -226,6 +227,8 @@
             tabPage2.ResumeLayout(false);
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
+            statusStrip1.ResumeLayout(false);
+            statusStrip1.PerformLayout();
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
             ResumeLayout(false);
@@ -248,7 +251,7 @@
         private ToolStripMenuItem 服务器设置ToolStripMenuItem;
         private Button ActivationSystemBtn;
         private Button NetBtn;
-        private Button button3;
         private Button DocumentMigrationBtn;
+        private ToolStripStatusLabel toolStripStatusLabel1;
     }
 }

@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Management;
 using Microsoft.Win32;
-namespace PCAssistant
+using System.Management;
+using System.Text;
+
+namespace PCAssistant.Services
 {
     public class ComputerInfo
     {
@@ -277,4 +274,4 @@ namespace PCAssistant
         public string MACAddress { get; set; }
         public List<string> IPAddresses { get; set; } = new List<string>();
     }
-}
+} 
