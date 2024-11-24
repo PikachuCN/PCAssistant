@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Management;
+using Microsoft.Win32;
 namespace PCAssistant
 {
     public class ComputerInfo
@@ -62,7 +63,77 @@ namespace PCAssistant
 
         private string GetOSVersion()
         {
-            return GetWMIInfo("Win32_OperatingSystem", "Version");
+            string version = GetWMIInfo("Win32_OperatingSystem", "Version");
+            string buildNumber = GetWMIInfo("Win32_OperatingSystem", "BuildNumber");
+
+            // 从注册表获取 DisplayVersion 或 ReleaseId
+            string detailedVersion = GetWindowsDetailedVersion();
+
+            if (!string.IsNullOrEmpty(version) && !string.IsNullOrEmpty(buildNumber))
+            {
+                string[] versionParts = version.Split('.');
+                int majorVersion = int.Parse(versionParts[0]);
+
+                if (majorVersion == 10)
+                {
+                    int buildNum = int.Parse(buildNumber);
+                    if (buildNum >= 22000)
+                    {
+                        return $"Windows 11 {detailedVersion} (Build {buildNumber})";
+                    }
+                    return $"Windows 10 {detailedVersion} (Build {buildNumber})";
+                }
+                else if (majorVersion == 6)
+                {
+                    int minorVersion = int.Parse(versionParts[1]);
+                    if (minorVersion == 1)
+                        return $"Windows 7 (Build {buildNumber})";
+                    if (minorVersion == 2)
+                        return $"Windows 8 (Build {buildNumber})";
+                    if (minorVersion == 3)
+                        return $"Windows 8.1 (Build {buildNumber})";
+                }
+
+                return $"Unknown Windows version ({version}, Build {buildNumber})";
+            }
+
+            return "Unknown Windows version";
+        }
+
+
+        private string GetWindowsDetailedVersion()
+        {
+            string detailedVersion = "";
+
+            try
+            {
+                // 打开注册表项
+                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion"))
+                {
+                    if (key != null)
+                    {
+                        // 尝试获取 DisplayVersion 或 ReleaseId
+                        object displayVersion = key.GetValue("DisplayVersion");
+                        object releaseId = key.GetValue("ReleaseId");
+
+                        if (displayVersion != null)
+                        {
+                            detailedVersion = displayVersion.ToString();
+                        }
+                        else if (releaseId != null)
+                        {
+                            detailedVersion = releaseId.ToString();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                detailedVersion = "Unknown Version";
+                // 你可以在这里记录异常信息
+            }
+
+            return detailedVersion;
         }
 
         private List<DiskDriveInfo> GetDiskDrivesInfo()
@@ -147,34 +218,41 @@ namespace PCAssistant
             return info;
         }
 
-        public void PrintInfo()
+
+        public string GetInfoString()
         {
-            Console.WriteLine($"CPU: {CPU}");
-            Console.WriteLine($"GPU: {GPU}");
-            Console.WriteLine($"Memory: {Memory}");
-            Console.WriteLine($"Motherboard: {Motherboard}");
-            Console.WriteLine($"BIOS Version: {BIOSVersion}");
-            Console.WriteLine($"Operating System Version: {OSVersion}");
-            Console.WriteLine("Disk Drives:");
+            StringBuilder infoBuilder = new StringBuilder();
+
+            infoBuilder.AppendLine($"CPU: {CPU}");
+            infoBuilder.AppendLine($"显卡: {GPU}");
+            infoBuilder.AppendLine($"内存: {Memory}");
+            infoBuilder.AppendLine($"主板信息: {Motherboard}");
+            infoBuilder.AppendLine($"BIOS 版本: {BIOSVersion}");
+            infoBuilder.AppendLine($"操作系统: {OSVersion}");
+
+            infoBuilder.AppendLine("磁盘信息:");
             foreach (var disk in DiskDrives)
             {
-                Console.WriteLine($"  - Model: {disk.Model}");
-                Console.WriteLine($"    Serial Number: {disk.SerialNumber}");
-                Console.WriteLine($"    Size: {disk.Size} GB");
+                infoBuilder.AppendLine($"  - 型号: {disk.Model}");
+                infoBuilder.AppendLine($"    磁盘序列号: {disk.SerialNumber}");
+                infoBuilder.AppendLine($"    总大小: {disk.Size} GB");
                 foreach (var partition in disk.Partitions)
                 {
-                    Console.WriteLine($"    Partition: {partition.Name}");
-                    Console.WriteLine($"      Capacity: {partition.Capacity} GB");
-                    Console.WriteLine($"      Free Space: {partition.FreeSpace} GB");
+                    infoBuilder.AppendLine($"    分区: {partition.Name}");
+                    infoBuilder.AppendLine($"      总容量: {partition.Capacity} GB");
+                    infoBuilder.AppendLine($"      可用空间e: {partition.FreeSpace} GB");
                 }
             }
-            Console.WriteLine("Network Interfaces:");
+
+            infoBuilder.AppendLine("网络信息:");
             foreach (var nic in NetworkInterfaces)
             {
-                Console.WriteLine($"  - Name: {nic.Name}");
-                Console.WriteLine($"    MAC Address: {nic.MACAddress}");
-                Console.WriteLine($"    IP Addresses: {string.Join(", ", nic.IPAddresses)}");
+                infoBuilder.AppendLine($"  - 网卡名字: {nic.Name}");
+                infoBuilder.AppendLine($"    MAC 地址: {nic.MACAddress}");
+                infoBuilder.AppendLine($"    IP 地址: {string.Join(", ", nic.IPAddresses)}");
             }
+
+            return infoBuilder.ToString();
         }
     }
 
