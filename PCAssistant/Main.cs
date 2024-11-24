@@ -1,5 +1,7 @@
 using System.Security.Principal;
 using System.Diagnostics;
+using System.IO;
+using PCAssistant.Services;
 
 namespace PCAssistant
 {
@@ -58,7 +60,7 @@ namespace PCAssistant
         private async void ActivationSystemBtn_Click(object sender, EventArgs e)
         {
             Logger.Instance.Info("开始检查系统激活状态...");
-            
+
             if (!IsAdministrator())
             {
                 Logger.Instance.Info("尝试以管理员权限重新启动程序...");
@@ -70,7 +72,7 @@ namespace PCAssistant
                         Verb = "runas", // 以管理员权限启动
                         UseShellExecute = true
                     };
-                    
+
                     Process.Start(startInfo);
                     Application.Exit(); // 关闭当前实例
                     return;
@@ -78,9 +80,9 @@ namespace PCAssistant
                 catch (Exception ex)
                 {
                     Logger.Instance.Error($"提升权限失败: {ex.Message}");
-                    MessageBox.Show("需要管理员权限才能执行此操作！\n请右键以管理员身份运行本程序。", 
-                                  "权限不足", 
-                                  MessageBoxButtons.OK, 
+                    MessageBox.Show("需要管理员权限才能执行此操作！\n请右键以管理员身份运行本程序。",
+                                  "权限不足",
+                                  MessageBoxButtons.OK,
                                   MessageBoxIcon.Warning);
                     return;
                 }
@@ -90,7 +92,7 @@ namespace PCAssistant
             {
                 ActivationSystemBtn.Enabled = false;
                 Logger.Instance.Info("开始执行系统激活...");
-                
+
                 // 执行激活命令
                 await Task.Run(() =>
                 {
@@ -146,6 +148,92 @@ namespace PCAssistant
             WindowsIdentity identity = WindowsIdentity.GetCurrent();
             WindowsPrincipal principal = new WindowsPrincipal(identity);
             return principal.IsInRole(WindowsBuiltInRole.Administrator);
+        }
+
+
+
+        private async void button3_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                DocumentMigrationBtn.Enabled = false;
+
+                var migrationService = new DocumentMigrationService();
+                var targetDrive = migrationService.GetTargetDrive();
+
+                if (targetDrive == null)
+                {
+                    MessageBox.Show("未找到可用的目标驱动器！", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                var result = MessageBox.Show(
+                    $"将把以下文件夹迁移到 {targetDrive.Name}：\n\n" +
+                    "1. 桌面\n" +
+                    "2. 我的文档\n\n" +
+                    "目标驱动器可用空间：" + $"{targetDrive.AvailableFreeSpace / (1024 * 1024 * 1024)}GB\n\n" +
+                    "是否继续？",
+                    "确认迁移",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question
+                );
+
+                if (result != DialogResult.Yes)
+                {
+                    Logger.Instance.Info("用户取消了迁移操作");
+                    return;
+                }
+
+                await migrationService.MigrateDocumentsAsync();
+
+                MessageBox.Show("文件迁移完成！需要重启电脑生效。", "操作完成", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.Error($"迁移过程中发生错误: {ex.Message}");
+                MessageBox.Show($"迁移过程中发生错误: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                DocumentMigrationBtn.Enabled = true;
+            }
+        }
+
+        private async void NetBtn_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                NetBtn.Enabled = false;
+                var progress = new Progress<string>(status => Logger.Instance.Info(status));
+                var networkService = new NetworkTestService();
+
+                Logger.Instance.Info("开始网络测试...");
+                var result = await networkService.RunNetworkTestAsync(progress);
+
+                // 显示测试结果
+                var message = $"网络测试结果：\n\n" +
+                             $"本地IP：{result.LocalIP}\n" +
+                             $"网关地址：{result.Gateway}\n" +
+                             $"外网连通性：{(result.HasInternetAccess ? "正常" : "异常")}\n\n" +
+                             $"网关延迟测试（1分钟）：\n" +
+                             $"平均延迟：{(result.GatewayAveragePing >= 0 ? $"{result.GatewayAveragePing:F2}ms" : "测试失败")}\n" +
+                             $"丢包数：{result.GatewayLostPackets}\n\n" +
+                             $"外网延迟测试（1分钟）：\n" +
+                             $"平均延迟：{(result.InternetAveragePing >= 0 ? $"{result.InternetAveragePing:F2}ms" : "测试失败")}\n" +
+                             $"丢包数：{result.InternetLostPackets}";
+
+                MessageBox.Show(message, "网络测试结果", MessageBoxButtons.OK, 
+                    result.HasInternetAccess ? MessageBoxIcon.Information : MessageBoxIcon.Warning);
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.Error($"网络测试失败: {ex.Message}");
+                MessageBox.Show($"网络测试失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                NetBtn.Enabled = true;
+            }
         }
     }
 }

@@ -33,7 +33,7 @@
             txtComputerInfo = new TextBox();
             tabPage2 = new TabPage();
             button3 = new Button();
-            button2 = new Button();
+            NetBtn = new Button();
             ActivationSystemBtn = new Button();
             tabPage3 = new TabPage();
             groupBox1 = new GroupBox();
@@ -43,6 +43,7 @@
             设置ToolStripMenuItem = new ToolStripMenuItem();
             切换管理权限ToolStripMenuItem = new ToolStripMenuItem();
             服务器设置ToolStripMenuItem = new ToolStripMenuItem();
+            DocumentMigrationBtn = new Button();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
             tabPage2.SuspendLayout();
@@ -87,7 +88,7 @@
             // tabPage2
             // 
             tabPage2.Controls.Add(button3);
-            tabPage2.Controls.Add(button2);
+            tabPage2.Controls.Add(NetBtn);
             tabPage2.Controls.Add(ActivationSystemBtn);
             tabPage2.Location = new Point(4, 26);
             tabPage2.Name = "tabPage2";
@@ -103,17 +104,19 @@
             button3.Name = "button3";
             button3.Size = new Size(132, 55);
             button3.TabIndex = 2;
-            button3.Text = "我的文档与桌面迁移";
+            button3.Text = "文档与桌面迁移";
             button3.UseVisualStyleBackColor = true;
+            button3.Click += button3_Click;
             // 
-            // button2
+            // NetBtn
             // 
-            button2.Location = new Point(144, 6);
-            button2.Name = "button2";
-            button2.Size = new Size(132, 55);
-            button2.TabIndex = 1;
-            button2.Text = "网络稳定性测试";
-            button2.UseVisualStyleBackColor = true;
+            NetBtn.Location = new Point(144, 6);
+            NetBtn.Name = "NetBtn";
+            NetBtn.Size = new Size(132, 55);
+            NetBtn.TabIndex = 1;
+            NetBtn.Text = "网络稳定性测试";
+            NetBtn.UseVisualStyleBackColor = true;
+            NetBtn.Click += NetBtn_Click;
             // 
             // ActivationSystemBtn
             // 
@@ -193,6 +196,13 @@
             服务器设置ToolStripMenuItem.Text = "服务器设置";
             服务器设置ToolStripMenuItem.Click += 服务器设置ToolStripMenuItem_Click;
             // 
+            // DocumentMigrationBtn
+            // 
+            DocumentMigrationBtn.Location = new Point(0, 0);
+            DocumentMigrationBtn.Name = "DocumentMigrationBtn";
+            DocumentMigrationBtn.Size = new Size(75, 23);
+            DocumentMigrationBtn.TabIndex = 0;
+            // 
             // Main
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
@@ -237,7 +247,8 @@
         private ToolStripMenuItem 切换管理权限ToolStripMenuItem;
         private ToolStripMenuItem 服务器设置ToolStripMenuItem;
         private Button ActivationSystemBtn;
-        private Button button2;
+        private Button NetBtn;
         private Button button3;
+        private Button DocumentMigrationBtn;
     }
 }
